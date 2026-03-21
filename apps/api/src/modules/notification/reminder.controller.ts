@@ -25,7 +25,9 @@ import { ReminderService } from './reminder.service';
 import { CreateReminderRuleDto } from './dto/create-reminder-rule.dto';
 
 @ApiTags('Reminders')
+@ApiTags('Reminders')
 @ApiBearerAuth()
+@Controller()
 @UseGuards(JwtAuthGuard, TenantGuard, RbacGuard)
 @RequirePermissions('settings:manage')
 export class ReminderController {

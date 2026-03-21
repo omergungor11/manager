@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { TenantContext } from '../tenant/tenant.decorator';
 import { CurrentTenant } from '../tenant/tenant.decorator';
 import { TenantGuard } from '../tenant/tenant.guard';
-import type { AuthService } from './auth.service';
+import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import type { LoginDto } from './dto/login.dto';
 import type { RegisterTenantDto } from './dto/register-tenant.dto';

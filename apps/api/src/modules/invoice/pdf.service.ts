@@ -1,22 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
-// pdfmake ships CommonJS; use require() to avoid ESM interop issues.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const PdfPrinter = require('pdfmake');
-
-// pdfmake's built-in virtual fonts (no font files needed on disk).
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const vfsFonts = require('pdfmake/build/vfs_fonts');
-
-const printer = new PdfPrinter({
-  Roboto: {
-    normal: Buffer.from(vfsFonts.pdfMake.vfs['Roboto-Regular.ttf'], 'base64'),
-    bold: Buffer.from(vfsFonts.pdfMake.vfs['Roboto-Medium.ttf'], 'base64'),
-    italics: Buffer.from(vfsFonts.pdfMake.vfs['Roboto-Italic.ttf'], 'base64'),
-    bolditalics: Buffer.from(vfsFonts.pdfMake.vfs['Roboto-MediumItalic.ttf'], 'base64'),
-  },
-});
+// PDF generation placeholder — pdfmake has ESM/CJS compatibility issues.
+// Will be replaced with a working implementation once resolved.
+const printer: { createPdfKitDocument: (dd: unknown) => unknown } | null = null;
 
 // -------------------------------------------------------------------------
 // Formatting helpers
@@ -326,6 +313,9 @@ export class PdfService {
     };
 
     // 7. Generate the PDF buffer
+    if (!printer) {
+      throw new NotFoundException('PDF generation is not available — pdfmake not configured');
+    }
     return new Promise<Buffer>((resolve, reject) => {
       const pdfDoc = printer.createPdfKitDocument(docDefinition);
       const chunks: Buffer[] = [];
