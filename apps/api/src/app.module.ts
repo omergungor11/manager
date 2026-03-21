@@ -12,6 +12,8 @@ import { CustomerModule } from './modules/customer/customer.module';
 import { VehicleModule } from './modules/vehicle/vehicle.module';
 import { ServiceCatalogModule } from './modules/service-catalog/service-catalog.module';
 import { ProductModule } from './modules/product/product.module';
+import { CustomerVehicleModule } from './modules/customer-vehicle/customer-vehicle.module';
+import { StockModule } from './modules/stock/stock.module';
 
 @Module({
   imports: [
@@ -28,8 +30,10 @@ import { ProductModule } from './modules/product/product.module';
     VehicleBrandModule,
     CustomerModule,
     VehicleModule,
+    CustomerVehicleModule,
     ServiceCatalogModule,
     ProductModule,
+    StockModule,
   ],
   controllers: [HealthController],
 })

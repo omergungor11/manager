@@ -1,7 +1,11 @@
 export { ServiceCatalogModule } from './service-catalog.module';
 export { ServiceCatalogService } from './service-catalog.service';
 export { ServiceCatalogController } from './service-catalog.controller';
+export { ServiceProductService } from './service-product.service';
+export { ServiceProductController } from './service-product.controller';
 export { CreateServiceCategoryDto } from './dto/create-service-category.dto';
 export { UpdateServiceCategoryDto } from './dto/update-service-category.dto';
 export { CreateServiceDefinitionDto } from './dto/create-service-definition.dto';
 export { UpdateServiceDefinitionDto } from './dto/update-service-definition.dto';
+export { AddServiceProductDto } from './dto/add-service-product.dto';
+export { UpdateServiceProductDto } from './dto/update-service-product.dto';

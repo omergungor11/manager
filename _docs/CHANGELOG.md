@@ -22,3 +22,7 @@
 - TASK-020: Vehicle CRUD — plate search, brand/model lookup, pagination
 - TASK-026: Service catalog — categories + service definitions CRUD
 - TASK-027: Product catalog — product categories, CRUD, low-stock alerts, cost/sale pricing
+- TASK-021: Customer-vehicle linking — assign, unassign, transfer ownership, set primary
+- TASK-028: Price management — price history, bulk update, margin calculation
+- TASK-029: Stock entry — supplier receiving, bulk entry, stock movements, auto currentStock update
+- TASK-032: Service-product linking — default materials per service definition

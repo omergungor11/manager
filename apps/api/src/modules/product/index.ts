@@ -1,8 +1,12 @@
 export { ProductModule } from './product.module';
 export { ProductService } from './product.service';
 export { ProductController, ProductCategoryController } from './product.controller';
+export { PriceService } from './price.service';
+export { PriceController } from './price.controller';
 export { CreateProductCategoryDto } from './dto/create-product-category.dto';
 export { UpdateProductCategoryDto } from './dto/update-product-category.dto';
 export { CreateProductDto } from './dto/create-product.dto';
 export { UpdateProductDto } from './dto/update-product.dto';
 export { QueryProductDto } from './dto/query-product.dto';
+export { UpdatePriceDto } from './dto/update-price.dto';
+export { BulkUpdatePriceDto, BulkPriceItemDto } from './dto/bulk-update-price.dto';
