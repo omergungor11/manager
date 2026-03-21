@@ -30,3 +30,9 @@
 - TASK-023: Vehicle service history — paginated work order history with last service date/km
 - TASK-030: Stock outflow — manual deduction, work order deduction, availability check
 - TASK-031: Stock adjustment — physical count vs system, bulk adjustment, stock count sheet
+- TASK-035: Work order module — create, items, totals, sequential order numbers
+- TASK-043: Account (cari hesap) module — CRUD, transactions, balance, customer linking
+- TASK-024: Customer frontend — list, detail, create/edit modal, search, pagination
+- TASK-025: Vehicle frontend — list, detail, service history, cascading brand/model dropdowns
+- TASK-033: Product & stock frontend — product CRUD, stock dashboard, entry, count/adjustment
+- TASK-034: Service catalog frontend — two-panel category/service view, linked products management

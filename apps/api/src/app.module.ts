@@ -15,6 +15,8 @@ import { ProductModule } from './modules/product/product.module';
 import { CustomerVehicleModule } from './modules/customer-vehicle/customer-vehicle.module';
 import { StockModule } from './modules/stock/stock.module';
 import { LookupModule } from './modules/lookup/lookup.module';
+import { WorkOrderModule } from './modules/work-order/work-order.module';
+import { AccountModule } from './modules/account/account.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { LookupModule } from './modules/lookup/lookup.module';
     ProductModule,
     StockModule,
     LookupModule,
+    WorkOrderModule,
+    AccountModule,
   ],
   controllers: [HealthController],
 })

@@ -6,18 +6,18 @@
 |-------|------|-------|------|-------------|---------|---------|
 | 0 | Project Setup & Tooling | 7 | 7 | 0 | 0 | 0 |
 | 1 | Core Infrastructure | 10 | 10 | 0 | 0 | 0 |
-| 2 | Müşteri & Araç Yönetimi | 8 | 6 | 0 | 0 | 2 |
-| 3 | Hizmet Kataloğu & Stok | 9 | 7 | 0 | 0 | 2 |
-| 4 | İş Emirleri & Faturalama | 8 | 0 | 0 | 0 | 8 |
-| 5 | Ön Muhasebe & Cari Hesaplar | 8 | 0 | 0 | 0 | 8 |
+| 2 | Müşteri & Araç Yönetimi | 8 | 8 | 0 | 0 | 0 |
+| 3 | Hizmet Kataloğu & Stok | 9 | 9 | 0 | 0 | 0 |
+| 4 | İş Emirleri & Faturalama | 8 | 1 | 0 | 0 | 7 |
+| 5 | Ön Muhasebe & Cari Hesaplar | 8 | 1 | 0 | 0 | 7 |
 | 6 | Çalışan & Bordro (KKTC) | 7 | 0 | 0 | 0 | 7 |
 | 7 | Bildirimler & Hatırlatmalar | 7 | 0 | 0 | 0 | 7 |
 | 8 | Raporlama & Analitik | 6 | 0 | 0 | 0 | 6 |
 | 9 | Orchestrator Admin Panel | 6 | 0 | 0 | 0 | 6 |
 | 10 | Frontend & PWA | 6 | 0 | 0 | 0 | 6 |
-| **Total** | | **82** | **30** | **0** | **0** | **52** |
+| **Total** | | **82** | **36** | **0** | **0** | **46** |
 
-**Progress**: 30/82 (37%)
+**Progress**: 36/82 (44%)
 
 ---
 
@@ -58,8 +58,8 @@
 | TASK-021 | Müşteri-araç ilişkilendirme | backend | S | COMPLETED | TASK-019, TASK-020 |
 | TASK-022 | Plaka ile hızlı müşteri/araç arama | backend | M | COMPLETED | TASK-021 |
 | TASK-023 | Araç servis geçmişi görüntüleme | backend | S | COMPLETED | TASK-021 |
-| TASK-024 | Müşteri frontend sayfaları | frontend | L | BLOCKED | TASK-019 |
-| TASK-025 | Araç frontend sayfaları | frontend | L | BLOCKED | TASK-020 |
+| TASK-024 | Müşteri frontend sayfaları | frontend | L | COMPLETED | TASK-019 |
+| TASK-025 | Araç frontend sayfaları | frontend | L | COMPLETED | TASK-020 |
 
 ## Phase 3: Hizmet Kataloğu & Stok
 
@@ -72,14 +72,14 @@
 | TASK-030 | Stok çıkış (hizmet verildiğinde otomatik düşüm) | backend | M | COMPLETED | TASK-029 |
 | TASK-031 | Stok sayım & düzeltme | backend | S | COMPLETED | TASK-029 |
 | TASK-032 | Hizmet-ürün ilişkisi (yağ değişimi → X lt yağ + filtre) | backend | M | COMPLETED | TASK-026, TASK-027 |
-| TASK-033 | Stok & ürün frontend sayfaları | frontend | L | BLOCKED | TASK-027 |
-| TASK-034 | Hizmet kataloğu frontend | frontend | M | BLOCKED | TASK-026 |
+| TASK-033 | Stok & ürün frontend sayfaları | frontend | L | COMPLETED | TASK-027 |
+| TASK-034 | Hizmet kataloğu frontend | frontend | M | COMPLETED | TASK-026 |
 
 ## Phase 4: İş Emirleri & Faturalama
 
 | ID | Task | Agent | Complexity | Status | Dependencies |
 |----|------|-------|-----------|--------|-------------|
-| TASK-035 | İş emri oluşturma (araç giriş → hizmet seçimi) | backend | L | BLOCKED | TASK-022, TASK-032 |
+| TASK-035 | İş emri oluşturma (araç giriş → hizmet seçimi) | backend | L | COMPLETED | TASK-022, TASK-032 |
 | TASK-036 | İş emri durumları (açık → devam → tamamlandı → faturalandı) | backend | M | BLOCKED | TASK-035 |
 | TASK-037 | İş emrinde stoktan otomatik malzeme düşümü | backend | M | BLOCKED | TASK-035, TASK-030 |
 | TASK-038 | Otomatik fatura oluşturma | backend | L | BLOCKED | TASK-036 |
@@ -92,7 +92,7 @@
 
 | ID | Task | Agent | Complexity | Status | Dependencies |
 |----|------|-------|-----------|--------|-------------|
-| TASK-043 | Cari hesap modülü (müşteri/tedarikçi cari) | backend | L | BLOCKED | TASK-019 |
+| TASK-043 | Cari hesap modülü (müşteri/tedarikçi cari) | backend | L | COMPLETED | TASK-019 |
 | TASK-044 | Cari hesap hareketleri (borç/alacak) | backend | M | BLOCKED | TASK-043 |
 | TASK-045 | Müşteri-cari hesap ilişkisi (1 müşteri → N cari) | backend | M | BLOCKED | TASK-043 |
 | TASK-046 | Gelir kayıtları (fatura → otomatik gelir) | backend | M | BLOCKED | TASK-038, TASK-043 |
