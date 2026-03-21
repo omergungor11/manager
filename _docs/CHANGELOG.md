@@ -19,3 +19,6 @@
 - TASK-017: Seed data — demo tenant, 20 araç markası/123 model, 4 default role, admin user
 - TASK-018: Vehicle brand/model API — list/search brands, list models by brand
 - TASK-019: Customer CRUD — create, read, update, soft-delete with search, pagination, sorting
+- TASK-020: Vehicle CRUD — plate search, brand/model lookup, pagination
+- TASK-026: Service catalog — categories + service definitions CRUD
+- TASK-027: Product catalog — product categories, CRUD, low-stock alerts, cost/sale pricing

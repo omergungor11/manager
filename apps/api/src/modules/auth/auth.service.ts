@@ -19,12 +19,12 @@ export class AuthService {
   async login(email: string, password: string, tenantSlug: string) {
     await this.prisma.setTenantSchema(tenantSlug);
 
-    const user = await this.prisma.user.findUnique({
-      where: { email },
+    const user = await this.prisma.user.findFirst({
+      where: { email, deletedAt: null },
       include: { role: true },
     });
 
-    if (!user || user.deletedAt) {
+    if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -59,10 +59,10 @@ export class AuthService {
     };
   }
 
-  async register(dto: RegisterDto, tenantSlug: string) {
+  async register(dto: RegisterDto, tenantId: string, tenantSlug: string) {
     await this.prisma.setTenantSchema(tenantSlug);
 
-    const existingUser = await this.prisma.user.findUnique({
+    const existingUser = await this.prisma.user.findFirst({
       where: { email: dto.email },
     });
 
@@ -78,12 +78,13 @@ export class AuthService {
 
     const user = await this.prisma.user.create({
       data: {
+        tenantId,
         email: dto.email,
         password: hashedPassword,
         name: dto.name,
         phone: dto.phone,
         status: 'active',
-        ...(defaultRole ? { roleId: defaultRole.id } : {}),
+        ...(defaultRole ? { role: { connect: { id: defaultRole.id } } } : {}),
       },
       include: { role: true },
     });
@@ -128,7 +129,7 @@ export class AuthService {
       dto.slug,
     );
 
-    const tenantRecord = tenant[0];
+    const tenantRecord = tenant[0]!;
     const schemaName = `tenant_${dto.slug}`;
 
     // Create tenant schema by cloning from template "tenant" schema

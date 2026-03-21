@@ -4,7 +4,7 @@ import { IsEmail, IsString, Matches, MinLength } from 'class-validator';
 export class RegisterTenantDto {
   @ApiProperty({ example: 'Acme Auto Service' })
   @IsString()
-  tenantName: string;
+  tenantName!: string;
 
   @ApiProperty({
     example: 'acme-auto',
@@ -14,18 +14,18 @@ export class RegisterTenantDto {
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
     message: 'slug must be lowercase alphanumeric with hyphens (e.g. "my-shop")',
   })
-  slug: string;
+  slug!: string;
 
   @ApiProperty({ example: 'Admin User' })
   @IsString()
-  adminName: string;
+  adminName!: string;
 
   @ApiProperty({ example: 'admin@example.com' })
   @IsEmail()
-  adminEmail: string;
+  adminEmail!: string;
 
   @ApiProperty({ example: 'securepass123' })
   @IsString()
   @MinLength(8)
-  adminPassword: string;
+  adminPassword!: string;
 }

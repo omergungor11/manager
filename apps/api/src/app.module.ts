@@ -9,6 +9,9 @@ import { RoleModule } from './modules/role/role.module';
 import { UserModule } from './modules/user/user.module';
 import { VehicleBrandModule } from './modules/vehicle-brand/vehicle-brand.module';
 import { CustomerModule } from './modules/customer/customer.module';
+import { VehicleModule } from './modules/vehicle/vehicle.module';
+import { ServiceCatalogModule } from './modules/service-catalog/service-catalog.module';
+import { ProductModule } from './modules/product/product.module';
 
 @Module({
   imports: [
@@ -24,6 +27,9 @@ import { CustomerModule } from './modules/customer/customer.module';
     UserModule,
     VehicleBrandModule,
     CustomerModule,
+    VehicleModule,
+    ServiceCatalogModule,
+    ProductModule,
   ],
   controllers: [HealthController],
 })

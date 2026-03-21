@@ -27,7 +27,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Register a new user within a tenant' })
   async register(@Body() dto: RegisterDto, @CurrentTenant() tenant: TenantContext) {
-    return this.authService.register(dto, tenant.slug);
+    return this.authService.register(dto, tenant.id, tenant.slug);
   }
 
   @Post('register-tenant')

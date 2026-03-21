@@ -36,7 +36,7 @@ export class TenantMiddleware implements NestMiddleware {
       throw new NotFoundException(`Tenant "${slug}" not found`);
     }
 
-    const record = tenant[0] as { id: string; slug: string; name: string; status: string };
+    const record = tenant[0]! as { id: string; slug: string; name: string; status: string };
 
     if (record.status !== 'active') {
       throw new ForbiddenException(`Tenant "${slug}" is not active`);
@@ -69,7 +69,7 @@ export class TenantMiddleware implements NestMiddleware {
         return parts[0];
       }
       if (parts.length <= 2) {
-        const hostname = parts[0].split(':')[0];
+        const hostname = parts[0]!.split(':')[0];
         if (hostname === 'localhost') {
           return 'localhost';
         }

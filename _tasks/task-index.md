@@ -6,8 +6,8 @@
 |-------|------|-------|------|-------------|---------|---------|
 | 0 | Project Setup & Tooling | 7 | 7 | 0 | 0 | 0 |
 | 1 | Core Infrastructure | 10 | 10 | 0 | 0 | 0 |
-| 2 | Müşteri & Araç Yönetimi | 8 | 2 | 0 | 1 | 5 |
-| 3 | Hizmet Kataloğu & Stok | 9 | 0 | 0 | 0 | 9 |
+| 2 | Müşteri & Araç Yönetimi | 8 | 3 | 0 | 0 | 5 |
+| 3 | Hizmet Kataloğu & Stok | 9 | 2 | 0 | 0 | 7 |
 | 4 | İş Emirleri & Faturalama | 8 | 0 | 0 | 0 | 8 |
 | 5 | Ön Muhasebe & Cari Hesaplar | 8 | 0 | 0 | 0 | 8 |
 | 6 | Çalışan & Bordro (KKTC) | 7 | 0 | 0 | 0 | 7 |
@@ -15,9 +15,9 @@
 | 8 | Raporlama & Analitik | 6 | 0 | 0 | 0 | 6 |
 | 9 | Orchestrator Admin Panel | 6 | 0 | 0 | 0 | 6 |
 | 10 | Frontend & PWA | 6 | 0 | 0 | 0 | 6 |
-| **Total** | | **82** | **19** | **0** | **1** | **62** |
+| **Total** | | **82** | **22** | **0** | **0** | **60** |
 
-**Progress**: 19/82 (23%)
+**Progress**: 22/82 (27%)
 
 ---
 
@@ -54,7 +54,7 @@
 |----|------|-------|-----------|--------|-------------|
 | TASK-018 | Araç marka/model veritabanı (master data) | database | M | COMPLETED | TASK-011 |
 | TASK-019 | Müşteri CRUD (kişi/firma, iletişim bilgileri) | backend | M | COMPLETED | TASK-012 |
-| TASK-020 | Araç CRUD (plaka, marka, model, yıl, km) | backend | M | PENDING | TASK-018 |
+| TASK-020 | Araç CRUD (plaka, marka, model, yıl, km) | backend | M | COMPLETED | TASK-018 |
 | TASK-021 | Müşteri-araç ilişkilendirme | backend | S | BLOCKED | TASK-019, TASK-020 |
 | TASK-022 | Plaka ile hızlı müşteri/araç arama | backend | M | BLOCKED | TASK-021 |
 | TASK-023 | Araç servis geçmişi görüntüleme | backend | S | BLOCKED | TASK-021 |
@@ -65,8 +65,8 @@
 
 | ID | Task | Agent | Complexity | Status | Dependencies |
 |----|------|-------|-----------|--------|-------------|
-| TASK-026 | Hizmet kategorileri & hizmet tanımları CRUD | backend | M | BLOCKED | TASK-012 |
-| TASK-027 | Ürün kataloğu CRUD (yağ, filtre, parça vb.) | backend | M | BLOCKED | TASK-012 |
+| TASK-026 | Hizmet kategorileri & hizmet tanımları CRUD | backend | M | COMPLETED | TASK-012 |
+| TASK-027 | Ürün kataloğu CRUD (yağ, filtre, parça vb.) | backend | M | COMPLETED | TASK-012 |
 | TASK-028 | Alış fiyatı vs satış fiyatı yönetimi | backend | M | BLOCKED | TASK-027 |
 | TASK-029 | Stok giriş (tedarikçiden alım) | backend | M | BLOCKED | TASK-027 |
 | TASK-030 | Stok çıkış (hizmet verildiğinde otomatik düşüm) | backend | M | BLOCKED | TASK-029 |
