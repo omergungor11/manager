@@ -20,7 +20,7 @@ Multi-tenant (horizontal SaaS) oto servis/makinistlere özel CRM + ön muhasebe 
 
 ## Mevcut Durum
 
-**Progress**: 12/82 task (%14) — Phase 0 tamamlandı, Phase 1 devam ediyor.
+**Progress**: 15/82 task (%18) — Phase 0 tamamlandı, Phase 1 devam ediyor (TASK-014, TASK-017 kaldı).
 
 > Her yeni session'da `_tasks/task-index.md` oku veya `/cold-start` çalıştır.
 
