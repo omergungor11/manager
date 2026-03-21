@@ -20,8 +20,9 @@ Multi-tenant (horizontal SaaS) oto servis/makinistlere özel CRM + ön muhasebe 
 
 ## Mevcut Durum
 
-**Progress**: 15/82 task (%18) — Phase 0 tamamlandı, Phase 1 devam ediyor (TASK-014, TASK-017 kaldı).
+**Progress**: 82/82 task (%100) — Tüm 10 phase tamamlandı.
 
+> Sonraki adımlar: pdfmake fix, E2E testler, offline sync, production build.
 > Her yeni session'da `_tasks/task-index.md` oku veya `/cold-start` çalıştır.
 
 ---
@@ -32,7 +33,7 @@ Multi-tenant (horizontal SaaS) oto servis/makinistlere özel CRM + ön muhasebe 
 manager/
 ├── apps/
 │   ├── api/          → Backend (NestJS) :4000
-│   ├── web/          → Frontend (Next.js) :3000
+│   ├── web/          → Frontend (Next.js) :3002
 │   └── admin/        → Orchestrator Admin Panel (Next.js) :3001
 ├── packages/
 │   ├── shared/       → Shared types, utils, constants
