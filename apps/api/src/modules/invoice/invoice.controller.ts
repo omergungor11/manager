@@ -6,8 +6,10 @@ import {
   Patch,
   Post,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -22,6 +24,7 @@ import { RbacGuard } from '../rbac/rbac.guard';
 import { RequirePermissions } from '../rbac/rbac.decorator';
 import { InvoiceService } from './invoice.service';
 import { PaymentService } from './payment.service';
+import { PdfService } from './pdf.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { QueryInvoiceDto } from './dto/query-invoice.dto';
@@ -34,6 +37,7 @@ export class InvoiceController {
   constructor(
     private readonly invoiceService: InvoiceService,
     private readonly paymentService: PaymentService,
+    private readonly pdfService: PdfService,
   ) {}
 
   // ------------------------------------------------------------------
@@ -91,6 +95,25 @@ export class InvoiceController {
   async cancel(@Param('id') id: string) {
     const invoice = await this.invoiceService.cancelInvoice(id);
     return { data: invoice };
+  }
+
+  @Get(':id/pdf')
+  @RequirePermissions('invoice:read')
+  @ApiOperation({ summary: 'Download invoice as a PDF file' })
+  @ApiParam({ name: 'id', description: 'Invoice UUID' })
+  async downloadPdf(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const buffer = await this.pdfService.generateInvoicePdf(id);
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="invoice-${id}.pdf"`,
+      'Content-Length': buffer.length,
+    });
+
+    res.end(buffer);
   }
 
   // ------------------------------------------------------------------

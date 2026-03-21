@@ -44,3 +44,14 @@
 - TASK-051: Employee CRUD — create, update, terminate, activate with status management
 - TASK-049: Cari hesap frontend — account list, detail, transactions, balance display
 - TASK-056: Employee frontend — list, detail, terminate/activate, salary formatting
+- TASK-039: Invoice PDF generation with pdfmake (tenant info, items table, totals)
+- TASK-041: Work order frontend — plate lookup flow, service/product items, status transitions
+- TASK-042: Invoice frontend — list, detail, payment recording, PDF download
+- TASK-044: Account transactions (implemented in account module)
+- TASK-045: Customer-account linking (implemented in account module)
+- TASK-046: Income module — auto-created from payments, read-only API, monthly summary
+- TASK-048: Cash register module — cash/bank accounts, transactions, transfers, daily report
+- TASK-052: KKTC payroll calculation — SGK, provident fund, progressive income tax
+- TASK-053: Payroll parameter management — configurable rates per tenant
+- TASK-054: Monthly payroll creation — single/bulk, approve/pay workflow
+- TASK-058: Notification infrastructure — create, send, stats (placeholder for SMS/email/WhatsApp)

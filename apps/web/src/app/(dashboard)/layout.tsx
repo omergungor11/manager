@@ -13,6 +13,7 @@ const navItems = [
   { href: '/products', label: 'Ürünler' },
   { href: '/stock', label: 'Stok' },
   { href: '/work-orders', label: 'İş Emirleri' },
+  { href: '/invoices', label: 'Faturalar' },
   { href: '/employees', label: 'Çalışanlar' },
 ];
 

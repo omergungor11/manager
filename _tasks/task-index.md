@@ -8,16 +8,16 @@
 | 1 | Core Infrastructure | 10 | 10 | 0 | 0 | 0 |
 | 2 | Müşteri & Araç Yönetimi | 8 | 8 | 0 | 0 | 0 |
 | 3 | Hizmet Kataloğu & Stok | 9 | 9 | 0 | 0 | 0 |
-| 4 | İş Emirleri & Faturalama | 8 | 5 | 0 | 3 | 0 |
-| 5 | Ön Muhasebe & Cari Hesaplar | 8 | 3 | 0 | 4 | 1 |
-| 6 | Çalışan & Bordro (KKTC) | 7 | 3 | 0 | 1 | 3 |
-| 7 | Bildirimler & Hatırlatmalar | 7 | 0 | 0 | 0 | 7 |
+| 4 | İş Emirleri & Faturalama | 8 | 8 | 0 | 0 | 0 |
+| 5 | Ön Muhasebe & Cari Hesaplar | 8 | 7 | 0 | 1 | 0 |
+| 6 | Çalışan & Bordro (KKTC) | 7 | 5 | 0 | 2 | 0 |
+| 7 | Bildirimler & Hatırlatmalar | 7 | 1 | 0 | 5 | 1 |
 | 8 | Raporlama & Analitik | 6 | 0 | 0 | 0 | 6 |
 | 9 | Orchestrator Admin Panel | 6 | 0 | 0 | 0 | 6 |
 | 10 | Frontend & PWA | 6 | 0 | 0 | 0 | 6 |
-| **Total** | | **82** | **47** | **0** | **8** | **27** |
+| **Total** | | **82** | **60** | **0** | **8** | **14** |
 
-**Progress**: 47/82 (57%)
+**Progress**: 60/82 (73%)
 
 ---
 
@@ -83,47 +83,47 @@
 | TASK-036 | İş emri durumları (açık → devam → tamamlandı → faturalandı) | backend | M | COMPLETED | TASK-035 |
 | TASK-037 | İş emrinde stoktan otomatik malzeme düşümü | backend | M | COMPLETED | TASK-035, TASK-030 |
 | TASK-038 | Otomatik fatura oluşturma | backend | L | COMPLETED | TASK-036 |
-| TASK-039 | Fatura PDF oluşturma | backend | M | PENDING | TASK-038 |
+| TASK-039 | Fatura PDF oluşturma | backend | M | COMPLETED | TASK-038 |
 | TASK-040 | Ödeme kayıt (nakit, kart, havale, cari hesaba yaz) | backend | M | COMPLETED | TASK-038 |
-| TASK-041 | İş emri frontend (hızlı akış: plaka → müşteri → hizmet → ödeme) | frontend | L | PENDING | TASK-035 |
-| TASK-042 | Fatura frontend sayfaları | frontend | M | PENDING | TASK-038 |
+| TASK-041 | İş emri frontend (hızlı akış: plaka → müşteri → hizmet → ödeme) | frontend | L | COMPLETED | TASK-035 |
+| TASK-042 | Fatura frontend sayfaları | frontend | M | COMPLETED | TASK-038 |
 
 ## Phase 5: Ön Muhasebe & Cari Hesaplar
 
 | ID | Task | Agent | Complexity | Status | Dependencies |
 |----|------|-------|-----------|--------|-------------|
 | TASK-043 | Cari hesap modülü (müşteri/tedarikçi cari) | backend | L | COMPLETED | TASK-019 |
-| TASK-044 | Cari hesap hareketleri (borç/alacak) | backend | M | PENDING | TASK-043 |
-| TASK-045 | Müşteri-cari hesap ilişkisi (1 müşteri → N cari) | backend | M | PENDING | TASK-043 |
-| TASK-046 | Gelir kayıtları (fatura → otomatik gelir) | backend | M | PENDING | TASK-038, TASK-043 |
+| TASK-044 | Cari hesap hareketleri (borç/alacak) | backend | M | COMPLETED | TASK-043 |
+| TASK-045 | Müşteri-cari hesap ilişkisi (1 müşteri → N cari) | backend | M | COMPLETED | TASK-043 |
+| TASK-046 | Gelir kayıtları (fatura → otomatik gelir) | backend | M | COMPLETED | TASK-038, TASK-043 |
 | TASK-047 | Gider kayıtları (kira, fatura, tedarik vb.) | backend | M | COMPLETED | TASK-043 |
-| TASK-048 | Kasa/banka hesapları | backend | M | PENDING | TASK-043 |
+| TASK-048 | Kasa/banka hesapları | backend | M | COMPLETED | TASK-043 |
 | TASK-049 | Cari hesap frontend sayfaları | frontend | L | COMPLETED | TASK-043 |
-| TASK-050 | Gelir/gider frontend sayfaları | frontend | M | BLOCKED | TASK-046, TASK-047 |
+| TASK-050 | Gelir/gider frontend sayfaları | frontend | M | PENDING | TASK-046, TASK-047 |
 
 ## Phase 6: Çalışan & Bordro (KKTC)
 
 | ID | Task | Agent | Complexity | Status | Dependencies |
 |----|------|-------|-----------|--------|-------------|
 | TASK-051 | Çalışan CRUD (kişisel bilgi, pozisyon, başlangıç) | backend | M | COMPLETED | TASK-012 |
-| TASK-052 | KKTC maaş hesaplama (brüt → net, SGK, ihtiyat sandığı) | backend | L | PENDING | TASK-051 |
-| TASK-053 | Asgari ücret & SGK parametre yönetimi (ayarlanabilir) | backend | M | BLOCKED | TASK-052 |
-| TASK-054 | Aylık bordro oluşturma | backend | M | BLOCKED | TASK-052 |
-| TASK-055 | Çalışan giderleri (maaş → otomatik gider kaydı) | backend | M | BLOCKED | TASK-054, TASK-047 |
+| TASK-052 | KKTC maaş hesaplama (brüt → net, SGK, ihtiyat sandığı) | backend | L | COMPLETED | TASK-051 |
+| TASK-053 | Asgari ücret & SGK parametre yönetimi (ayarlanabilir) | backend | M | COMPLETED | TASK-052 |
+| TASK-054 | Aylık bordro oluşturma | backend | M | COMPLETED | TASK-052 |
+| TASK-055 | Çalışan giderleri (maaş → otomatik gider kaydı) | backend | M | PENDING | TASK-054, TASK-047 |
 | TASK-056 | Çalışan frontend sayfaları | frontend | L | COMPLETED | TASK-051 |
-| TASK-057 | Bordro frontend sayfaları | frontend | M | BLOCKED | TASK-054 |
+| TASK-057 | Bordro frontend sayfaları | frontend | M | PENDING | TASK-054 |
 
 ## Phase 7: Bildirimler & Hatırlatmalar
 
 | ID | Task | Agent | Complexity | Status | Dependencies |
 |----|------|-------|-----------|--------|-------------|
-| TASK-058 | Notification altyapısı (BullMQ queue) | backend | M | BLOCKED | TASK-012 |
-| TASK-059 | SMS gateway entegrasyonu | backend | M | BLOCKED | TASK-058 |
-| TASK-060 | Email gönderim servisi | backend | M | BLOCKED | TASK-058 |
-| TASK-061 | WhatsApp Business API entegrasyonu | backend | L | BLOCKED | TASK-058 |
-| TASK-062 | Servis hatırlatma motoru (X gün sonra otomatik) | backend | L | BLOCKED | TASK-058, TASK-036 |
+| TASK-058 | Notification altyapısı (BullMQ queue) | backend | M | COMPLETED | TASK-012 |
+| TASK-059 | SMS gateway entegrasyonu | backend | M | PENDING | TASK-058 |
+| TASK-060 | Email gönderim servisi | backend | M | PENDING | TASK-058 |
+| TASK-061 | WhatsApp Business API entegrasyonu | backend | L | PENDING | TASK-058 |
+| TASK-062 | Servis hatırlatma motoru (X gün sonra otomatik) | backend | L | PENDING | TASK-058, TASK-036 |
 | TASK-063 | Hatırlatma kuralları yönetimi (tenant ayarları) | backend | M | BLOCKED | TASK-062 |
-| TASK-064 | Bildirim frontend sayfaları & ayarları | frontend | M | BLOCKED | TASK-058 |
+| TASK-064 | Bildirim frontend sayfaları & ayarları | frontend | M | PENDING | TASK-058 |
 
 ## Phase 8: Raporlama & Analitik
 

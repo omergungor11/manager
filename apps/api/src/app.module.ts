@@ -20,6 +20,10 @@ import { AccountModule } from './modules/account/account.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { ExpenseModule } from './modules/expense/expense.module';
 import { EmployeeModule } from './modules/employee/employee.module';
+import { IncomeModule } from './modules/income/income.module';
+import { CashRegisterModule } from './modules/cash-register/cash-register.module';
+import { PayrollModule } from './modules/payroll/payroll.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -46,6 +50,10 @@ import { EmployeeModule } from './modules/employee/employee.module';
     InvoiceModule,
     ExpenseModule,
     EmployeeModule,
+    IncomeModule,
+    CashRegisterModule,
+    PayrollModule,
+    NotificationModule,
   ],
   controllers: [HealthController],
 })
