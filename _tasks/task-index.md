@@ -6,7 +6,7 @@
 |-------|------|-------|------|-------------|---------|---------|
 | 0 | Project Setup & Tooling | 7 | 7 | 0 | 0 | 0 |
 | 1 | Core Infrastructure | 10 | 10 | 0 | 0 | 0 |
-| 2 | Müşteri & Araç Yönetimi | 8 | 0 | 0 | 0 | 8 |
+| 2 | Müşteri & Araç Yönetimi | 8 | 2 | 0 | 1 | 5 |
 | 3 | Hizmet Kataloğu & Stok | 9 | 0 | 0 | 0 | 9 |
 | 4 | İş Emirleri & Faturalama | 8 | 0 | 0 | 0 | 8 |
 | 5 | Ön Muhasebe & Cari Hesaplar | 8 | 0 | 0 | 0 | 8 |
@@ -15,9 +15,9 @@
 | 8 | Raporlama & Analitik | 6 | 0 | 0 | 0 | 6 |
 | 9 | Orchestrator Admin Panel | 6 | 0 | 0 | 0 | 6 |
 | 10 | Frontend & PWA | 6 | 0 | 0 | 0 | 6 |
-| **Total** | | **82** | **17** | **0** | **0** | **65** |
+| **Total** | | **82** | **19** | **0** | **1** | **62** |
 
-**Progress**: 17/82 (21%)
+**Progress**: 19/82 (23%)
 
 ---
 
@@ -52,9 +52,9 @@
 
 | ID | Task | Agent | Complexity | Status | Dependencies |
 |----|------|-------|-----------|--------|-------------|
-| TASK-018 | Araç marka/model veritabanı (master data) | database | M | PENDING | TASK-011 |
-| TASK-019 | Müşteri CRUD (kişi/firma, iletişim bilgileri) | backend | M | BLOCKED | TASK-012 |
-| TASK-020 | Araç CRUD (plaka, marka, model, yıl, km) | backend | M | BLOCKED | TASK-018 |
+| TASK-018 | Araç marka/model veritabanı (master data) | database | M | COMPLETED | TASK-011 |
+| TASK-019 | Müşteri CRUD (kişi/firma, iletişim bilgileri) | backend | M | COMPLETED | TASK-012 |
+| TASK-020 | Araç CRUD (plaka, marka, model, yıl, km) | backend | M | PENDING | TASK-018 |
 | TASK-021 | Müşteri-araç ilişkilendirme | backend | S | BLOCKED | TASK-019, TASK-020 |
 | TASK-022 | Plaka ile hızlı müşteri/araç arama | backend | M | BLOCKED | TASK-021 |
 | TASK-023 | Araç servis geçmişi görüntüleme | backend | S | BLOCKED | TASK-021 |

@@ -7,6 +7,8 @@ import { TenantModule } from './modules/tenant/tenant.module';
 import { RbacModule } from './modules/rbac/rbac.module';
 import { RoleModule } from './modules/role/role.module';
 import { UserModule } from './modules/user/user.module';
+import { VehicleBrandModule } from './modules/vehicle-brand/vehicle-brand.module';
+import { CustomerModule } from './modules/customer/customer.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { UserModule } from './modules/user/user.module';
     RbacModule,
     RoleModule,
     UserModule,
+    VehicleBrandModule,
+    CustomerModule,
   ],
   controllers: [HealthController],
 })

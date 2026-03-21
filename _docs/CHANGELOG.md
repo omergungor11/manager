@@ -17,3 +17,5 @@
 - TASK-016: Shared packages (shared types, db/Prisma, UI)
 - TASK-014: User access control — RBAC guard, permissions, role CRUD, user-role assignment
 - TASK-017: Seed data — demo tenant, 20 araç markası/123 model, 4 default role, admin user
+- TASK-018: Vehicle brand/model API — list/search brands, list models by brand
+- TASK-019: Customer CRUD — create, read, update, soft-delete with search, pagination, sorting
