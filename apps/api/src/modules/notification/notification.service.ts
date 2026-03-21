@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import type { CreateNotificationDto } from './dto/create-notification.dto';
 import type { QueryNotificationDto } from './dto/query-notification.dto';
+import { ChannelFactory, type ChannelType } from './channels/channel.factory';
+import type { SmsChannel } from './channels/sms.channel';
+import type { EmailChannel } from './channels/email.channel';
+import type { WhatsAppChannel } from './channels/whatsapp.channel';
 
 /**
  * Internal shape stored in the DB:
@@ -63,7 +67,12 @@ interface NotificationRecord {
  */
 @Injectable()
 export class NotificationService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(NotificationService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly channelFactory: ChannelFactory,
+  ) {}
 
   // ------------------------------------------------------------------
   // Private helpers
@@ -296,12 +305,61 @@ export class NotificationService {
   }
 
   /**
-   * Placeholder send implementation.
-   * Actual SMS/email/WhatsApp integrations will replace this in future tasks.
-   * For now it simply marks the notification as SENT.
+   * Route a notification to the correct channel service, then mark it SENT
+   * on success or FAILED on error.
+   *
+   * Channel mapping:
+   *   sms       → SmsChannel.send(phone, message)
+   *   email     → EmailChannel.send(to, title, message)
+   *   whatsapp  → WhatsAppChannel.send(phone, message)
+   *
+   * For push notifications (not yet implemented) the method falls through to
+   * marking the record SENT so the DB stays consistent.
    */
   async send(notificationId: string): Promise<NotificationRecord> {
-    return this.markSent(notificationId);
+    const notification = await this.findById(notificationId);
+
+    const supportedChannels: ChannelType[] = ['sms', 'email', 'whatsapp'];
+    const channel = notification.channel as ChannelType;
+
+    if (!supportedChannels.includes(channel)) {
+      // push / unknown — mark sent without real delivery for now
+      this.logger.warn(
+        `Channel "${channel}" has no delivery adapter yet; marking SENT.`,
+      );
+      return this.markSent(notificationId);
+    }
+
+    try {
+      const adapter = this.channelFactory.getChannel(channel);
+
+      if (channel === 'email') {
+        const emailAdapter = adapter as EmailChannel;
+        const to =
+          notification.recipientEmail ??
+          notification.recipientPhone ??
+          notification.recipientId ??
+          '';
+        await emailAdapter.send(to, notification.title, notification.message);
+      } else {
+        const phoneAdapter = adapter as SmsChannel | WhatsAppChannel;
+        const phone =
+          notification.recipientPhone ??
+          notification.recipientEmail ??
+          notification.recipientId ??
+          '';
+        await phoneAdapter.send(phone, notification.message);
+      }
+
+      return this.markSent(notificationId);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Unknown delivery error';
+      this.logger.error(
+        `Failed to send notification ${notificationId} via ${channel}: ${message}`,
+      );
+      return this.markFailed(notificationId, message);
+    }
   }
 
   /**

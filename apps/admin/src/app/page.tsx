@@ -1,7 +1,3 @@
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <h1 className="text-3xl font-bold">Manager &mdash; Orchestrator Admin Panel</h1>
-    </div>
-  );
-}
+// This file intentionally left as a non-page module.
+// The root route (/) is handled by app/(admin)/page.tsx
+export {};

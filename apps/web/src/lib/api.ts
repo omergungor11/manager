@@ -101,6 +101,13 @@ export const apiClient = {
     });
   },
 
+  put<T>(path: string, body: unknown): Promise<ApiResponse<T>> {
+    return request<T>(path, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    });
+  },
+
   delete<T>(path: string): Promise<ApiResponse<T>> {
     return request<T>(path, { method: 'DELETE' });
   },

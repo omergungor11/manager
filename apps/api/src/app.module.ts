@@ -24,6 +24,8 @@ import { IncomeModule } from './modules/income/income.module';
 import { CashRegisterModule } from './modules/cash-register/cash-register.module';
 import { PayrollModule } from './modules/payroll/payroll.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { ReportingModule } from './modules/reporting/reporting.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -54,6 +56,8 @@ import { NotificationModule } from './modules/notification/notification.module';
     CashRegisterModule,
     PayrollModule,
     NotificationModule,
+    ReportingModule,
+    AdminModule,
   ],
   controllers: [HealthController],
 })

@@ -1,0 +1,39 @@
+{
+  "name": "Manager - Oto Servis Yönetim",
+  "short_name": "Manager",
+  "description": "Oto servis yönetim platformu — araç, stok, hizmet, faturalama",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#1e40af",
+  "lang": "tr",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Yeni İş Emri",
+      "url": "/work-orders/new",
+      "description": "Yeni iş emri oluştur"
+    },
+    {
+      "name": "Müşteriler",
+      "url": "/customers",
+      "description": "Müşteri listesi"
+    }
+  ]
+}
