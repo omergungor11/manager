@@ -3,25 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3002",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "next lint"
   },
   "dependencies": {
+    "@manager/shared": "workspace:*",
+    "@manager/ui": "workspace:*",
     "next": "^15",
     "react": "^19",
-    "react-dom": "^19",
-    "@manager/shared": "workspace:*",
-    "@manager/ui": "workspace:*"
+    "react-dom": "^19"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/react": "^19",
+    "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^22",
-    "tailwindcss": "^4",
+    "@types/react": "^19",
+    "autoprefixer": "^10",
     "postcss": "^8",
-    "autoprefixer": "^10"
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
