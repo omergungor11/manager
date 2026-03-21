@@ -36,3 +36,11 @@
 - TASK-025: Vehicle frontend — list, detail, service history, cascading brand/model dropdowns
 - TASK-033: Product & stock frontend — product CRUD, stock dashboard, entry, count/adjustment
 - TASK-034: Service catalog frontend — two-panel category/service view, linked products management
+- TASK-036: Work order status flow — DRAFT→IN_PROGRESS→COMPLETED→INVOICED with transition guards
+- TASK-037: Auto stock deduction on work order completion, reversal on cancellation
+- TASK-038: Invoice creation from completed work orders with sequential numbering
+- TASK-040: Payment recording (cash/card/transfer/account) with partial payment support
+- TASK-047: Expense module — CRUD, categories, monthly summary, cari hesap integration
+- TASK-051: Employee CRUD — create, update, terminate, activate with status management
+- TASK-049: Cari hesap frontend — account list, detail, transactions, balance display
+- TASK-056: Employee frontend — list, detail, terminate/activate, salary formatting

@@ -22,6 +22,7 @@ import { CurrentTenant, type TenantContext } from '../tenant/tenant.decorator';
 import { RbacGuard } from '../rbac/rbac.guard';
 import { RequirePermissions } from '../rbac/rbac.decorator';
 import { WorkOrderService } from './work-order.service';
+import { ChangeStatusDto } from './dto/change-status.dto';
 import { CreateWorkOrderDto } from './dto/create-work-order.dto';
 import { UpdateWorkOrderDto } from './dto/update-work-order.dto';
 import { AddWorkOrderItemDto } from './dto/add-work-order-item.dto';
@@ -111,6 +112,26 @@ export class WorkOrderController {
     @Param('itemId') itemId: string,
   ) {
     const workOrder = await this.workOrderService.removeItem(id, itemId);
+    return { data: workOrder };
+  }
+
+  @Patch(':id/status')
+  @RequirePermissions('work_order:update')
+  @ApiOperation({
+    summary: 'Change work order status',
+    description:
+      'Valid transitions: DRAFT → IN_PROGRESS | CANCELLED, ' +
+      'IN_PROGRESS → COMPLETED | CANCELLED. ' +
+      'COMPLETED → INVOICED is handled automatically by invoice creation. ' +
+      'INVOICED and CANCELLED are terminal states.',
+  })
+  @ApiParam({ name: 'id', description: 'Work order UUID' })
+  async changeStatus(
+    @Param('id') id: string,
+    @CurrentTenant() tenant: TenantContext,
+    @Body() dto: ChangeStatusDto,
+  ) {
+    const workOrder = await this.workOrderService.changeStatus(id, tenant.id, dto);
     return { data: workOrder };
   }
 }

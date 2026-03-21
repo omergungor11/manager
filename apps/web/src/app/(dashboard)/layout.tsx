@@ -13,6 +13,7 @@ const navItems = [
   { href: '/products', label: 'Ürünler' },
   { href: '/stock', label: 'Stok' },
   { href: '/work-orders', label: 'İş Emirleri' },
+  { href: '/employees', label: 'Çalışanlar' },
 ];
 
 export default function DashboardLayout({

@@ -17,6 +17,9 @@ import { StockModule } from './modules/stock/stock.module';
 import { LookupModule } from './modules/lookup/lookup.module';
 import { WorkOrderModule } from './modules/work-order/work-order.module';
 import { AccountModule } from './modules/account/account.module';
+import { InvoiceModule } from './modules/invoice/invoice.module';
+import { ExpenseModule } from './modules/expense/expense.module';
+import { EmployeeModule } from './modules/employee/employee.module';
 
 @Module({
   imports: [
@@ -40,6 +43,9 @@ import { AccountModule } from './modules/account/account.module';
     LookupModule,
     WorkOrderModule,
     AccountModule,
+    InvoiceModule,
+    ExpenseModule,
+    EmployeeModule,
   ],
   controllers: [HealthController],
 })

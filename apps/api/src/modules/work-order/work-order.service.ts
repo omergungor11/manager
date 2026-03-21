@@ -1,12 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import type { AddWorkOrderItemDto } from './dto/add-work-order-item.dto';
+import type { ChangeStatusDto } from './dto/change-status.dto';
 import type { CreateWorkOrderDto } from './dto/create-work-order.dto';
 import type { QueryWorkOrderDto } from './dto/query-work-order.dto';
 import type { UpdateWorkOrderDto } from './dto/update-work-order.dto';
 
+// Allowed forward transitions. INVOICED and CANCELLED are terminal states
+// and cannot be transitioned away from manually.
+const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+  DRAFT: ['IN_PROGRESS', 'CANCELLED'],
+  IN_PROGRESS: ['COMPLETED', 'CANCELLED'],
+  COMPLETED: [], // only INVOICED is possible, but only via invoice creation
+  INVOICED: [],
+  CANCELLED: [],
+};
+
 @Injectable()
 export class WorkOrderService {
+  private readonly logger = new Logger(WorkOrderService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   /**
@@ -238,6 +251,185 @@ export class WorkOrderService {
     await this.prisma.workOrderItem.delete({ where: { id: itemId } });
 
     return this.recalculateTotals(workOrderId);
+  }
+
+  /**
+   * Changes the status of a work order after validating the transition is
+   * permitted.
+   *
+   * Side-effects:
+   *   DRAFT/IN_PROGRESS → COMPLETED  — sets completedAt and deducts stock.
+   *   IN_PROGRESS/COMPLETED → CANCELLED — reverses previously deducted stock.
+   *
+   * All mutations run inside a single Prisma interactive transaction so that
+   * a partial stock update never leaves the order in an inconsistent state.
+   */
+  async changeStatus(id: string, tenantId: string, data: ChangeStatusDto) {
+    const workOrder = await this.prisma.workOrder.findFirst({
+      where: { id, tenantId },
+    });
+
+    if (!workOrder) {
+      throw new NotFoundException('Work order not found');
+    }
+
+    const current = workOrder.status;
+    const target = data.status;
+
+    const allowed = ALLOWED_TRANSITIONS[current] ?? [];
+    if (!allowed.includes(target)) {
+      throw new BadRequestException(
+        `Cannot transition work order from ${current} to ${target}. ` +
+          `Allowed transitions from ${current}: [${allowed.join(', ') || 'none'}].`,
+      );
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const updateData: Record<string, unknown> = {
+        status: target,
+        ...(data.notes !== undefined ? { notes: data.notes } : {}),
+      };
+
+      if (target === 'COMPLETED') {
+        updateData['completedAt'] = new Date();
+        await this.deductStockForOrder(id, tenantId, tx);
+      }
+
+      if (target === 'CANCELLED' && (current === 'IN_PROGRESS' || current === 'COMPLETED')) {
+        await this.reverseStockForOrder(id, tenantId, tx);
+      }
+
+      return tx.workOrder.update({
+        where: { id },
+        data: updateData,
+        include: {
+          customer: true,
+          vehicle: true,
+          technician: true,
+          items: {
+            include: {
+              serviceDefinition: true,
+              product: true,
+            },
+          },
+        },
+      });
+    });
+  }
+
+  /**
+   * For each WorkOrderItem of type 'product', creates an OUT StockMovement
+   * and decrements Product.currentStock atomically inside the provided
+   * transaction context.
+   *
+   * Logs a warning (but does NOT throw) when an item's stock would go below
+   * zero — the movement is still recorded so the shortfall is visible in the
+   * audit trail.
+   */
+  async deductStockForOrder(
+    workOrderId: string,
+    tenantId: string,
+    tx: Parameters<Parameters<PrismaService['$transaction']>[0]>[0],
+  ): Promise<void> {
+    const productItems = await tx.workOrderItem.findMany({
+      where: { workOrderId, type: 'product', productId: { not: null } },
+      select: { productId: true, quantity: true, description: true },
+    });
+
+    for (const item of productItems) {
+      const productId = item.productId as string;
+      const qty = Number(item.quantity);
+
+      const product = await tx.product.findUnique({
+        where: { id: productId },
+        select: { currentStock: true, name: true },
+      });
+
+      if (!product) {
+        this.logger.warn(
+          `deductStockForOrder: product ${productId} not found, skipping.`,
+        );
+        continue;
+      }
+
+      const newStock = Number(product.currentStock) - qty;
+
+      if (newStock < 0) {
+        this.logger.warn(
+          `deductStockForOrder: insufficient stock for product "${product.name}" ` +
+            `(id: ${productId}). Requested ${qty}, available ${product.currentStock}. ` +
+            `Stock will go negative — movement recorded for audit.`,
+        );
+      }
+
+      await tx.stockMovement.create({
+        data: {
+          tenantId,
+          productId,
+          type: 'OUT',
+          quantity: qty,
+          referenceType: 'work_order',
+          referenceId: workOrderId,
+          reason: `Work order completed: ${item.description}`,
+        },
+      });
+
+      await tx.product.update({
+        where: { id: productId },
+        data: { currentStock: newStock },
+      });
+    }
+  }
+
+  /**
+   * Reverses the stock deductions previously recorded for this work order by
+   * creating IN StockMovements and incrementing Product.currentStock.
+   * Called when a work order is cancelled after stock was already deducted
+   * (i.e. when cancelling from IN_PROGRESS or COMPLETED).
+   */
+  async reverseStockForOrder(
+    workOrderId: string,
+    tenantId: string,
+    tx: Parameters<Parameters<PrismaService['$transaction']>[0]>[0],
+  ): Promise<void> {
+    const productItems = await tx.workOrderItem.findMany({
+      where: { workOrderId, type: 'product', productId: { not: null } },
+      select: { productId: true, quantity: true, description: true },
+    });
+
+    for (const item of productItems) {
+      const productId = item.productId as string;
+      const qty = Number(item.quantity);
+
+      const product = await tx.product.findUnique({
+        where: { id: productId },
+        select: { currentStock: true },
+      });
+
+      if (!product) {
+        this.logger.warn(
+          `reverseStockForOrder: product ${productId} not found, skipping reversal.`,
+        );
+        continue;
+      }
+
+      await tx.stockMovement.create({
+        data: {
+          tenantId,
+          productId,
+          type: 'IN',
+          quantity: qty,
+          referenceType: 'work_order',
+          referenceId: workOrderId,
+          reason: `Work order cancelled — reversing stock: ${item.description}`,
+        },
+      });
+
+      await tx.product.update({
+        where: { id: productId },
+        data: { currentStock: Number(product.currentStock) + qty },
+      });
+    }
   }
 
   /**
