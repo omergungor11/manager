@@ -1,10 +1,787 @@
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["public", "tenant"]
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
-// Models will be added in Phase 1 (TASK-011)
+// ============================================================================
+// PUBLIC SCHEMA — Global/shared data (tenant-independent)
+// ============================================================================
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  domain    String?  @unique
+  status    String   @default("active") // active, inactive, suspended
+  plan      String   @default("free") // free, pro, enterprise
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("tenants")
+  @@schema("public")
+}
+
+model VehicleBrand {
+  id      String  @id @default(uuid())
+  name    String  @unique
+  logo    String?
+  country String?
+
+  models VehicleModel[]
+
+  @@map("vehicle_brands")
+  @@schema("public")
+}
+
+model VehicleModel {
+  id        String  @id @default(uuid())
+  brandId   String  @map("brand_id")
+  name      String
+  yearStart Int?    @map("year_start")
+  yearEnd   Int?    @map("year_end")
+  bodyType  String? @map("body_type") // sedan, hatchback, suv, pickup, van, etc.
+
+  brand VehicleBrand @relation(fields: [brandId], references: [id])
+
+  @@unique([brandId, name])
+  @@map("vehicle_models")
+  @@schema("public")
+}
+
+// ============================================================================
+// TENANT SCHEMA — Per-tenant business data
+// All models below are created in each tenant's schema (tenant_{slug})
+// ============================================================================
+
+// --- Auth & Users ---
+
+model User {
+  id        String    @id @default(uuid())
+  tenantId  String    @map("tenant_id")
+  email     String
+  password  String
+  name      String
+  phone     String?
+  status    String    @default("active") // active, inactive, banned
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  roleId String? @map("role_id")
+  role   Role?   @relation(fields: [roleId], references: [id])
+
+  auditLogs  AuditLog[]
+  workOrders WorkOrder[] @relation("TechnicianWorkOrders")
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@map("users")
+  @@schema("tenant")
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  tenantId    String   @map("tenant_id")
+  name        String // admin, manager, technician, cashier
+  permissions String[] @default([])
+  isDefault   Boolean  @default(false) @map("is_default")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users User[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  @@map("roles")
+  @@schema("tenant")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  userId    String?  @map("user_id")
+  action    String // create, update, delete, login, logout
+  entity    String // Customer, Vehicle, WorkOrder, etc.
+  entityId  String?  @map("entity_id")
+  data      Json?
+  ip        String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+  @@schema("tenant")
+}
+
+// --- Customers & Vehicles ---
+
+model Customer {
+  id        String    @id @default(uuid())
+  tenantId  String    @map("tenant_id")
+  type      String    @default("individual") // individual, company
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  taxId     String?   @map("tax_id")
+  notes     String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  createdBy String?   @map("created_by")
+  updatedBy String?   @map("updated_by")
+
+  vehicles   CustomerVehicle[]
+  accounts   CustomerAccount[]
+  workOrders WorkOrder[]
+  invoices   Invoice[]
+  reminders  Reminder[]
+
+  @@index([tenantId])
+  @@index([tenantId, phone])
+  @@index([tenantId, name])
+  @@map("customers")
+  @@schema("tenant")
+}
+
+model Vehicle {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  licensePlate String    @map("license_plate")
+  brandId      String?   @map("brand_id") // ref to public.vehicle_brands (app-level)
+  modelId      String?   @map("model_id") // ref to public.vehicle_models (app-level)
+  brandName    String?   @map("brand_name") // denormalized for quick access
+  modelName    String?   @map("model_name") // denormalized for quick access
+  year         Int?
+  color        String?
+  vin          String?
+  currentKm    Int?      @default(0) @map("current_km")
+  notes        String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  customers  CustomerVehicle[]
+  workOrders WorkOrder[]
+  reminders  Reminder[]
+
+  @@unique([tenantId, licensePlate])
+  @@index([tenantId])
+  @@index([tenantId, licensePlate])
+  @@map("vehicles")
+  @@schema("tenant")
+}
+
+model CustomerVehicle {
+  id         String    @id @default(uuid())
+  customerId String    @map("customer_id")
+  vehicleId  String    @map("vehicle_id")
+  isPrimary  Boolean   @default(false) @map("is_primary")
+  since      DateTime  @default(now())
+  until      DateTime?
+
+  customer Customer @relation(fields: [customerId], references: [id])
+  vehicle  Vehicle  @relation(fields: [vehicleId], references: [id])
+
+  @@unique([customerId, vehicleId])
+  @@map("customer_vehicles")
+  @@schema("tenant")
+}
+
+// --- Service Catalog ---
+
+model ServiceCategory {
+  id          String   @id @default(uuid())
+  tenantId    String   @map("tenant_id")
+  name        String
+  description String?
+  sortOrder   Int      @default(0) @map("sort_order")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  services ServiceDefinition[]
+
+  @@index([tenantId])
+  @@map("service_categories")
+  @@schema("tenant")
+}
+
+model ServiceDefinition {
+  id                String   @id @default(uuid())
+  tenantId          String   @map("tenant_id")
+  categoryId        String   @map("category_id")
+  name              String
+  description       String?
+  defaultPrice      Decimal  @default(0) @map("default_price") @db.Decimal(12, 2)
+  estimatedDuration Int?     @map("estimated_duration") // minutes
+  isActive          Boolean  @default(true) @map("is_active")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  category       ServiceCategory  @relation(fields: [categoryId], references: [id])
+  products       ServiceProduct[]
+  reminderRules  ReminderRule[]
+  workOrderItems WorkOrderItem[]
+
+  @@index([tenantId])
+  @@map("service_definitions")
+  @@schema("tenant")
+}
+
+model ServiceProduct {
+  id                  String  @id @default(uuid())
+  serviceDefinitionId String  @map("service_definition_id")
+  productId           String  @map("product_id")
+  defaultQuantity     Decimal @default(1) @map("default_quantity") @db.Decimal(10, 3)
+
+  serviceDefinition ServiceDefinition @relation(fields: [serviceDefinitionId], references: [id])
+  product           Product           @relation(fields: [productId], references: [id])
+
+  @@unique([serviceDefinitionId, productId])
+  @@map("service_products")
+  @@schema("tenant")
+}
+
+// --- Products & Stock ---
+
+model ProductCategory {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  products Product[]
+
+  @@index([tenantId])
+  @@map("product_categories")
+  @@schema("tenant")
+}
+
+model Product {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  categoryId   String?   @map("category_id")
+  sku          String?
+  name         String
+  unit         String    @default("adet") // adet, lt, kg, mt
+  costPrice    Decimal   @default(0) @map("cost_price") @db.Decimal(12, 2)
+  salePrice    Decimal   @default(0) @map("sale_price") @db.Decimal(12, 2)
+  currentStock Decimal   @default(0) @map("current_stock") @db.Decimal(10, 3)
+  minStock     Decimal   @default(0) @map("min_stock") @db.Decimal(10, 3)
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  category       ProductCategory? @relation(fields: [categoryId], references: [id])
+  priceHistory   PriceHistory[]
+  serviceProducts ServiceProduct[]
+  stockEntries   StockEntry[]
+  stockMovements StockMovement[]
+  workOrderItems WorkOrderItem[]
+
+  @@unique([tenantId, sku])
+  @@index([tenantId])
+  @@map("products")
+  @@schema("tenant")
+}
+
+model PriceHistory {
+  id        String   @id @default(uuid())
+  productId String   @map("product_id")
+  costPrice Decimal  @map("cost_price") @db.Decimal(12, 2)
+  salePrice Decimal  @map("sale_price") @db.Decimal(12, 2)
+  changedAt DateTime @default(now()) @map("changed_at")
+  changedBy String?  @map("changed_by")
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@map("price_history")
+  @@schema("tenant")
+}
+
+model StockEntry {
+  id         String   @id @default(uuid())
+  tenantId   String   @map("tenant_id")
+  productId  String   @map("product_id")
+  quantity   Decimal  @db.Decimal(10, 3)
+  unitCost   Decimal  @map("unit_cost") @db.Decimal(12, 2)
+  supplierId String?  @map("supplier_id") // ref to Account (supplier type)
+  invoiceNo  String?  @map("invoice_no")
+  date       DateTime @default(now())
+  notes      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([tenantId])
+  @@index([productId])
+  @@map("stock_entries")
+  @@schema("tenant")
+}
+
+model StockMovement {
+  id            String   @id @default(uuid())
+  tenantId      String   @map("tenant_id")
+  productId     String   @map("product_id")
+  type          String // IN, OUT, ADJUST
+  quantity      Decimal  @db.Decimal(10, 3)
+  referenceType String?  @map("reference_type") // work_order, stock_entry, adjustment
+  referenceId   String?  @map("reference_id")
+  reason        String?
+  date          DateTime @default(now())
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([tenantId])
+  @@index([productId])
+  @@index([referenceType, referenceId])
+  @@map("stock_movements")
+  @@schema("tenant")
+}
+
+// --- Work Orders ---
+
+model WorkOrder {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  orderNo      String    @map("order_no") // tenant-scoped sequential
+  customerId   String    @map("customer_id")
+  vehicleId    String    @map("vehicle_id")
+  technicianId String?   @map("technician_id")
+  status       String    @default("DRAFT") // DRAFT, IN_PROGRESS, COMPLETED, INVOICED, CANCELLED
+  currentKm    Int?      @map("current_km")
+  notes        String?
+  subtotal     Decimal   @default(0) @db.Decimal(12, 2)
+  taxRate      Decimal   @default(0) @map("tax_rate") @db.Decimal(5, 2)
+  taxAmount    Decimal   @default(0) @map("tax_amount") @db.Decimal(12, 2)
+  total        Decimal   @default(0) @db.Decimal(12, 2)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  completedAt  DateTime? @map("completed_at")
+
+  customer   Customer        @relation(fields: [customerId], references: [id])
+  vehicle    Vehicle         @relation(fields: [vehicleId], references: [id])
+  technician User?           @relation("TechnicianWorkOrders", fields: [technicianId], references: [id])
+  items      WorkOrderItem[]
+  invoice    Invoice?
+  reminders  Reminder[]
+
+  @@unique([tenantId, orderNo])
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([customerId])
+  @@index([vehicleId])
+  @@map("work_orders")
+  @@schema("tenant")
+}
+
+model WorkOrderItem {
+  id                  String  @id @default(uuid())
+  workOrderId         String  @map("work_order_id")
+  type                String // service, product
+  serviceDefinitionId String? @map("service_definition_id")
+  productId           String? @map("product_id")
+  description         String
+  quantity            Decimal @default(1) @db.Decimal(10, 3)
+  unitPrice           Decimal @default(0) @map("unit_price") @db.Decimal(12, 2)
+  total               Decimal @default(0) @db.Decimal(12, 2)
+
+  workOrder         WorkOrder          @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  serviceDefinition ServiceDefinition? @relation(fields: [serviceDefinitionId], references: [id])
+  product           Product?           @relation(fields: [productId], references: [id])
+
+  @@index([workOrderId])
+  @@map("work_order_items")
+  @@schema("tenant")
+}
+
+// --- Invoicing & Payments ---
+
+model Invoice {
+  id          String    @id @default(uuid())
+  tenantId    String    @map("tenant_id")
+  invoiceNo   String    @map("invoice_no") // tenant-scoped sequential
+  workOrderId String    @unique @map("work_order_id")
+  customerId  String    @map("customer_id")
+  accountId   String?   @map("account_id") // cari hesap
+  date        DateTime  @default(now())
+  dueDate     DateTime? @map("due_date")
+  subtotal    Decimal   @default(0) @db.Decimal(12, 2)
+  taxRate     Decimal   @default(0) @map("tax_rate") @db.Decimal(5, 2)
+  taxAmount   Decimal   @default(0) @map("tax_amount") @db.Decimal(12, 2)
+  total       Decimal   @default(0) @db.Decimal(12, 2)
+  paidAmount  Decimal   @default(0) @map("paid_amount") @db.Decimal(12, 2)
+  status      String    @default("DRAFT") // DRAFT, SENT, PAID, PARTIALLY_PAID, OVERDUE, CANCELLED
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  workOrder WorkOrder     @relation(fields: [workOrderId], references: [id])
+  customer  Customer      @relation(fields: [customerId], references: [id])
+  account   Account?      @relation(fields: [accountId], references: [id])
+  items     InvoiceItem[]
+  payments  Payment[]
+
+  @@unique([tenantId, invoiceNo])
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([customerId])
+  @@map("invoices")
+  @@schema("tenant")
+}
+
+model InvoiceItem {
+  id          String  @id @default(uuid())
+  invoiceId   String  @map("invoice_id")
+  description String
+  quantity    Decimal @default(1) @db.Decimal(10, 3)
+  unitPrice   Decimal @default(0) @map("unit_price") @db.Decimal(12, 2)
+  total       Decimal @default(0) @db.Decimal(12, 2)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("invoice_items")
+  @@schema("tenant")
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  invoiceId String   @map("invoice_id")
+  amount    Decimal  @db.Decimal(12, 2)
+  method    String // CASH, CARD, TRANSFER, ACCOUNT
+  notes     String?
+  date      DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@index([tenantId])
+  @@index([invoiceId])
+  @@map("payments")
+  @@schema("tenant")
+}
+
+// --- Accounting (Ön Muhasebe) ---
+
+model Account {
+  id          String    @id @default(uuid())
+  tenantId    String    @map("tenant_id")
+  code        String // unique per tenant — cari hesap kodu
+  name        String
+  type        String // CUSTOMER, SUPPLIER, OTHER
+  balance     Decimal   @default(0) @db.Decimal(12, 2)
+  creditLimit Decimal?  @map("credit_limit") @db.Decimal(12, 2)
+  phone       String?
+  email       String?
+  address     String?
+  notes       String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  customers    CustomerAccount[]
+  transactions AccountTransaction[]
+  invoices     Invoice[]
+  expenses     Expense[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@index([tenantId, type])
+  @@map("accounts")
+  @@schema("tenant")
+}
+
+model CustomerAccount {
+  id         String  @id @default(uuid())
+  customerId String  @map("customer_id")
+  accountId  String  @map("account_id")
+  isDefault  Boolean @default(false) @map("is_default")
+
+  customer Customer @relation(fields: [customerId], references: [id])
+  account  Account  @relation(fields: [accountId], references: [id])
+
+  @@unique([customerId, accountId])
+  @@map("customer_accounts")
+  @@schema("tenant")
+}
+
+model AccountTransaction {
+  id            String   @id @default(uuid())
+  tenantId      String   @map("tenant_id")
+  accountId     String   @map("account_id")
+  type          String // debit, credit
+  amount        Decimal  @db.Decimal(12, 2)
+  description   String?
+  referenceType String?  @map("reference_type") // invoice, payment, expense, manual
+  referenceId   String?  @map("reference_id")
+  balanceAfter  Decimal  @map("balance_after") @db.Decimal(12, 2)
+  date          DateTime @default(now())
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id])
+
+  @@index([tenantId])
+  @@index([accountId])
+  @@index([date])
+  @@map("account_transactions")
+  @@schema("tenant")
+}
+
+model Income {
+  id         String   @id @default(uuid())
+  tenantId   String   @map("tenant_id")
+  category   String // service, product_sale, other
+  amount     Decimal  @db.Decimal(12, 2)
+  description String?
+  invoiceId  String?  @map("invoice_id")
+  paymentId  String?  @map("payment_id")
+  accountId  String?  @map("account_id")
+  date       DateTime @default(now())
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([tenantId])
+  @@index([tenantId, date])
+  @@map("incomes")
+  @@schema("tenant")
+}
+
+model Expense {
+  id         String   @id @default(uuid())
+  tenantId   String   @map("tenant_id")
+  category   String // rent, electricity, water, supplies, personnel, other
+  amount     Decimal  @db.Decimal(12, 2)
+  description String?
+  supplierId String?  @map("supplier_id") // ref to Account (supplier)
+  accountId  String?  @map("account_id")
+  receiptUrl String?  @map("receipt_url")
+  date       DateTime @default(now())
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  account Account? @relation(fields: [accountId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, date])
+  @@index([tenantId, category])
+  @@map("expenses")
+  @@schema("tenant")
+}
+
+model CashRegister {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  name      String
+  type      String // cash, bank
+  balance   Decimal  @default(0) @db.Decimal(12, 2)
+  accountNo String?  @map("account_no")
+  bankName  String?  @map("bank_name")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  transactions CashRegisterTransaction[]
+
+  @@index([tenantId])
+  @@map("cash_registers")
+  @@schema("tenant")
+}
+
+model CashRegisterTransaction {
+  id             String   @id @default(uuid())
+  tenantId       String   @map("tenant_id")
+  cashRegisterId String   @map("cash_register_id")
+  type           String // in, out, transfer
+  amount         Decimal  @db.Decimal(12, 2)
+  description    String?
+  referenceType  String?  @map("reference_type") // payment, expense, transfer
+  referenceId    String?  @map("reference_id")
+  balanceAfter   Decimal  @map("balance_after") @db.Decimal(12, 2)
+  date           DateTime @default(now())
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  cashRegister CashRegister @relation(fields: [cashRegisterId], references: [id])
+
+  @@index([tenantId])
+  @@index([cashRegisterId])
+  @@map("cash_register_transactions")
+  @@schema("tenant")
+}
+
+// --- Employees & Payroll ---
+
+model Employee {
+  id          String    @id @default(uuid())
+  tenantId    String    @map("tenant_id")
+  userId      String?   @map("user_id") // optional link to User
+  name        String
+  phone       String?
+  email       String?
+  tcNo        String?   @map("tc_no") // kimlik no
+  position    String?
+  department  String?
+  startDate   DateTime  @map("start_date")
+  endDate     DateTime? @map("end_date")
+  grossSalary Decimal   @default(0) @map("gross_salary") @db.Decimal(12, 2)
+  status      String    @default("active") // active, inactive, terminated
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  payrolls Payroll[]
+
+  @@index([tenantId])
+  @@map("employees")
+  @@schema("tenant")
+}
+
+model PayrollParams {
+  id            String    @id @default(uuid())
+  tenantId      String?   @map("tenant_id") // null = global default
+  name          String // min_wage, sgk_employee_rate, sgk_employer_rate, provident_employee_rate, provident_employer_rate, income_tax_bracket_1, etc.
+  value         String // stored as string, parsed as needed
+  effectiveFrom DateTime  @map("effective_from")
+  effectiveTo   DateTime? @map("effective_to")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@index([tenantId])
+  @@index([name, effectiveFrom])
+  @@map("payroll_params")
+  @@schema("tenant")
+}
+
+model Payroll {
+  id                  String   @id @default(uuid())
+  tenantId            String   @map("tenant_id")
+  employeeId          String   @map("employee_id")
+  month               Int
+  year                Int
+  grossSalary         Decimal  @map("gross_salary") @db.Decimal(12, 2)
+  sgkEmployee         Decimal  @map("sgk_employee") @db.Decimal(12, 2)
+  sgkEmployer         Decimal  @map("sgk_employer") @db.Decimal(12, 2)
+  providentEmployee   Decimal  @map("provident_employee") @db.Decimal(12, 2)
+  providentEmployer   Decimal  @map("provident_employer") @db.Decimal(12, 2)
+  incomeTax           Decimal  @map("income_tax") @db.Decimal(12, 2)
+  netSalary           Decimal  @map("net_salary") @db.Decimal(12, 2)
+  status              String   @default("draft") // draft, approved, paid
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@unique([tenantId, employeeId, month, year])
+  @@index([tenantId])
+  @@map("payrolls")
+  @@schema("tenant")
+}
+
+// --- Notifications & Reminders ---
+
+model Notification {
+  id          String    @id @default(uuid())
+  tenantId    String    @map("tenant_id")
+  type        String // sms, email, whatsapp
+  recipientId String?   @map("recipient_id") // customerId
+  recipient   String // phone number or email
+  subject     String?
+  content     String
+  status      String    @default("queued") // queued, sent, failed
+  sentAt      DateTime? @map("sent_at")
+  error       String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@map("notifications")
+  @@schema("tenant")
+}
+
+model NotificationTemplate {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  name      String
+  channel   String // sms, email, whatsapp
+  subject   String?
+  body      String
+  variables String[] @default([])
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  @@map("notification_templates")
+  @@schema("tenant")
+}
+
+model Reminder {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  workOrderId  String?   @map("work_order_id")
+  customerId   String    @map("customer_id")
+  vehicleId    String?   @map("vehicle_id")
+  reminderDate DateTime  @map("reminder_date")
+  type         String // service_due, km_due, custom
+  status       String    @default("pending") // pending, sent, cancelled
+  channel      String // sms, email, whatsapp
+  message      String?
+  sentAt       DateTime? @map("sent_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  workOrder WorkOrder? @relation(fields: [workOrderId], references: [id])
+  customer  Customer   @relation(fields: [customerId], references: [id])
+  vehicle   Vehicle?   @relation(fields: [vehicleId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, status, reminderDate])
+  @@map("reminders")
+  @@schema("tenant")
+}
+
+model ReminderRule {
+  id                  String  @id @default(uuid())
+  tenantId            String  @map("tenant_id")
+  serviceDefinitionId String? @map("service_definition_id")
+  name                String
+  daysAfter           Int     @map("days_after")
+  kmAfter             Int?    @map("km_after")
+  channel             String // sms, email, whatsapp
+  messageTemplate     String  @map("message_template")
+  isActive            Boolean @default(true) @map("is_active")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  serviceDefinition ServiceDefinition? @relation(fields: [serviceDefinitionId], references: [id])
+
+  @@index([tenantId])
+  @@map("reminder_rules")
+  @@schema("tenant")
+}
+
+// --- Tenant Settings ---
+
+model TenantSettings {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  key       String
+  value     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([tenantId, key])
+  @@map("tenant_settings")
+  @@schema("tenant")
+}
