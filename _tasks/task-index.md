@@ -5,7 +5,7 @@
 | Phase | Name | Total | Done | In Progress | Pending | Blocked |
 |-------|------|-------|------|-------------|---------|---------|
 | 0 | Project Setup & Tooling | 7 | 7 | 0 | 0 | 0 |
-| 1 | Core Infrastructure | 10 | 9 | 0 | 0 | 1 |
+| 1 | Core Infrastructure | 10 | 10 | 0 | 0 | 0 |
 | 2 | Müşteri & Araç Yönetimi | 8 | 0 | 0 | 0 | 8 |
 | 3 | Hizmet Kataloğu & Stok | 9 | 0 | 0 | 0 | 9 |
 | 4 | İş Emirleri & Faturalama | 8 | 0 | 0 | 0 | 8 |
@@ -15,9 +15,9 @@
 | 8 | Raporlama & Analitik | 6 | 0 | 0 | 0 | 6 |
 | 9 | Orchestrator Admin Panel | 6 | 0 | 0 | 0 | 6 |
 | 10 | Frontend & PWA | 6 | 0 | 0 | 0 | 6 |
-| **Total** | | **82** | **16** | **0** | **1** | **65** |
+| **Total** | | **82** | **17** | **0** | **0** | **65** |
 
-**Progress**: 16/82 (19%)
+**Progress**: 17/82 (21%)
 
 ---
 
@@ -46,7 +46,7 @@
 | TASK-014 | User access control (roles & permissions) | backend | M | COMPLETED | TASK-013 |
 | TASK-015 | Wildcard subdomain routing (Nginx + Next.js middleware) | devops | M | COMPLETED | TASK-009 |
 | TASK-016 | Shared packages setup (types, utils, UI) | devops | M | COMPLETED | TASK-007 |
-| TASK-017 | Seed data (demo tenant, admin user, roles) | database | S | PENDING | TASK-014 |
+| TASK-017 | Seed data (demo tenant, admin user, roles) | database | S | COMPLETED | TASK-014 |
 
 ## Phase 2: Müşteri & Araç Yönetimi
 
