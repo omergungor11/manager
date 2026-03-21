@@ -4,6 +4,9 @@ import { HealthController } from './health.controller';
 import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { TenantModule } from './modules/tenant/tenant.module';
+import { RbacModule } from './modules/rbac/rbac.module';
+import { RoleModule } from './modules/role/role.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -14,6 +17,9 @@ import { TenantModule } from './modules/tenant/tenant.module';
     PrismaModule,
     TenantModule,
     AuthModule,
+    RbacModule,
+    RoleModule,
+    UserModule,
   ],
   controllers: [HealthController],
 })

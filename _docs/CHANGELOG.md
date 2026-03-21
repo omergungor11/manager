@@ -15,3 +15,4 @@
 - TASK-010: Next.js 15 admin panel (apps/admin)
 - TASK-015: Wildcard subdomain routing (Next.js middleware)
 - TASK-016: Shared packages (shared types, db/Prisma, UI)
+- TASK-014: User access control — RBAC guard, permissions, role CRUD, user-role assignment

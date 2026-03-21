@@ -5,7 +5,7 @@
 | Phase | Name | Total | Done | In Progress | Pending | Blocked |
 |-------|------|-------|------|-------------|---------|---------|
 | 0 | Project Setup & Tooling | 7 | 7 | 0 | 0 | 0 |
-| 1 | Core Infrastructure | 10 | 8 | 0 | 1 | 1 |
+| 1 | Core Infrastructure | 10 | 9 | 0 | 0 | 1 |
 | 2 | Müşteri & Araç Yönetimi | 8 | 0 | 0 | 0 | 8 |
 | 3 | Hizmet Kataloğu & Stok | 9 | 0 | 0 | 0 | 9 |
 | 4 | İş Emirleri & Faturalama | 8 | 0 | 0 | 0 | 8 |
@@ -15,9 +15,9 @@
 | 8 | Raporlama & Analitik | 6 | 0 | 0 | 0 | 6 |
 | 9 | Orchestrator Admin Panel | 6 | 0 | 0 | 0 | 6 |
 | 10 | Frontend & PWA | 6 | 0 | 0 | 0 | 6 |
-| **Total** | | **82** | **15** | **0** | **2** | **65** |
+| **Total** | | **82** | **16** | **0** | **1** | **65** |
 
-**Progress**: 15/82 (18%)
+**Progress**: 16/82 (19%)
 
 ---
 
@@ -43,10 +43,10 @@
 | TASK-011 | Prisma schema — base models (Tenant, User, Role) | database | L | COMPLETED | TASK-008 |
 | TASK-012 | Multi-tenant middleware (subdomain → schema) | backend | L | COMPLETED | TASK-011 |
 | TASK-013 | Auth module (JWT + refresh + RBAC) | backend | L | COMPLETED | TASK-011 |
-| TASK-014 | User access control (roles & permissions) | backend | M | PENDING | TASK-013 |
+| TASK-014 | User access control (roles & permissions) | backend | M | COMPLETED | TASK-013 |
 | TASK-015 | Wildcard subdomain routing (Nginx + Next.js middleware) | devops | M | COMPLETED | TASK-009 |
 | TASK-016 | Shared packages setup (types, utils, UI) | devops | M | COMPLETED | TASK-007 |
-| TASK-017 | Seed data (demo tenant, admin user, roles) | database | S | BLOCKED | TASK-014 |
+| TASK-017 | Seed data (demo tenant, admin user, roles) | database | S | PENDING | TASK-014 |
 
 ## Phase 2: Müşteri & Araç Yönetimi
 
