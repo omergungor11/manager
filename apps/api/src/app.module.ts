@@ -14,6 +14,7 @@ import { ServiceCatalogModule } from './modules/service-catalog/service-catalog.
 import { ProductModule } from './modules/product/product.module';
 import { CustomerVehicleModule } from './modules/customer-vehicle/customer-vehicle.module';
 import { StockModule } from './modules/stock/stock.module';
+import { LookupModule } from './modules/lookup/lookup.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { StockModule } from './modules/stock/stock.module';
     ServiceCatalogModule,
     ProductModule,
     StockModule,
+    LookupModule,
   ],
   controllers: [HealthController],
 })

@@ -26,3 +26,7 @@
 - TASK-028: Price management — price history, bulk update, margin calculation
 - TASK-029: Stock entry — supplier receiving, bulk entry, stock movements, auto currentStock update
 - TASK-032: Service-product linking — default materials per service definition
+- TASK-022: Plate lookup — exact match + partial search autocomplete
+- TASK-023: Vehicle service history — paginated work order history with last service date/km
+- TASK-030: Stock outflow — manual deduction, work order deduction, availability check
+- TASK-031: Stock adjustment — physical count vs system, bulk adjustment, stock count sheet

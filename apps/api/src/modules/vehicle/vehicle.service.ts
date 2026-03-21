@@ -147,4 +147,65 @@ export class VehicleService {
       data: { deletedAt: new Date() },
     });
   }
+
+  async getServiceHistory(vehicleId: string, page: number, limit: number) {
+    // Verify the vehicle exists before querying its work orders
+    await this.findById(vehicleId);
+
+    const [workOrders, total] = await Promise.all([
+      this.prisma.workOrder.findMany({
+        where: { vehicleId },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          customer: true,
+          items: {
+            include: {
+              serviceDefinition: true,
+              product: true,
+            },
+          },
+        },
+      }),
+      this.prisma.workOrder.count({ where: { vehicleId } }),
+    ]);
+
+    // Derive last service stats from the most recent completed work order.
+    // Because results are already ordered by createdAt desc we only need to
+    // find the first COMPLETED record in the current page or fall back to a
+    // dedicated query when none appear on the first page.
+    let lastServiceDate: Date | null = null;
+    let lastServiceKm: number | null = null;
+
+    const firstCompleted = workOrders.find((wo) => wo.status === 'COMPLETED');
+
+    if (firstCompleted) {
+      lastServiceDate = firstCompleted.completedAt ?? firstCompleted.createdAt;
+      lastServiceKm = firstCompleted.currentKm ?? null;
+    } else {
+      // The current page may not contain a COMPLETED order; query explicitly.
+      const latestCompleted = await this.prisma.workOrder.findFirst({
+        where: { vehicleId, status: 'COMPLETED' },
+        orderBy: { createdAt: 'desc' },
+        select: { completedAt: true, createdAt: true, currentKm: true },
+      });
+
+      if (latestCompleted) {
+        lastServiceDate =
+          latestCompleted.completedAt ?? latestCompleted.createdAt;
+        lastServiceKm = latestCompleted.currentKm ?? null;
+      }
+    }
+
+    return {
+      items: workOrders,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      lastServiceDate,
+      lastServiceKm,
+    };
+  }
 }

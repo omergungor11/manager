@@ -25,6 +25,7 @@ import { VehicleService } from './vehicle.service';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
 import { QueryVehicleDto } from './dto/query-vehicle.dto';
+import { ServiceHistoryQueryDto } from './dto/service-history-query.dto';
 
 @ApiTags('Vehicles')
 @ApiBearerAuth()
@@ -68,6 +69,31 @@ export class VehicleController {
   ) {
     const vehicle = await this.vehicleService.findByPlate(tenant.id, plate);
     return { data: vehicle };
+  }
+
+  @Get(':id/service-history')
+  @RequirePermissions('vehicle:read')
+  @ApiOperation({
+    summary: 'Get paginated work-order history for a vehicle',
+    description:
+      'Returns all work orders for the vehicle ordered by creation date descending. ' +
+      'Meta includes lastServiceDate and lastServiceKm derived from the most recent COMPLETED order.',
+  })
+  @ApiParam({ name: 'id', description: 'Vehicle ID' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
+  async getServiceHistory(
+    @Param('id') id: string,
+    @Query() query: ServiceHistoryQueryDto,
+  ) {
+    const { page = 1, limit = 20 } = query;
+    const { items, total, totalPages, lastServiceDate, lastServiceKm } =
+      await this.vehicleService.getServiceHistory(id, page, limit);
+
+    return {
+      data: items,
+      meta: { total, page, limit, totalPages, lastServiceDate, lastServiceKm },
+    };
   }
 
   @Get(':id')
