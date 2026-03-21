@@ -1,0 +1,27 @@
+{
+  "name": "@manager/admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^15",
+    "react": "^19",
+    "react-dom": "^19",
+    "@manager/shared": "workspace:*",
+    "@manager/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/react": "^19",
+    "@types/node": "^22",
+    "tailwindcss": "^4",
+    "postcss": "^8",
+    "autoprefixer": "^10"
+  }
+}

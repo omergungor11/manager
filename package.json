@@ -1,0 +1,30 @@
+{
+  "name": "manager",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Multi-tenant oto servis CRM + ön muhasebe platformu",
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:api": "turbo dev --filter=@manager/api",
+    "dev:web": "turbo dev --filter=@manager/web",
+    "dev:admin": "turbo dev --filter=@manager/admin",
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "test": "turbo test",
+    "db:generate": "turbo db:generate --filter=@manager/db",
+    "db:migrate": "turbo db:migrate --filter=@manager/db",
+    "db:seed": "turbo db:seed --filter=@manager/db"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.25.0",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0"
+  }
+}
